@@ -1,5 +1,7 @@
 package init.upinmcSE;
 
+import init.upinmcSE.components.TcpServer;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,6 +13,9 @@ import java.util.concurrent.CompletableFuture;
 public class Main {
     public static void main(String[] args) {
         System.out.println("Hello world!");
+
+        TcpServer tcpServer = new TcpServer();
+        tcpServer.startServer();
 
         ServerSocket serverSocket = null;
         Socket clientSocket = null;
