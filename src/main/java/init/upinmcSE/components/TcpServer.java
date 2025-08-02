@@ -20,6 +20,9 @@ public class TcpServer {
     @Autowired
     private RespSerializer respSerializer;
 
+    @Autowired
+    private CommandHandler commandHandler;
+
     public void startServer() {
         ServerSocket serverSocket = null;
         Socket clientSocket = null;
@@ -71,27 +74,29 @@ public class TcpServer {
                 }
             }
         }
-
-//        Scanner sc = new Scanner(client.inputStream);
-//        while(sc.hasNextLine()){
-//            String nextLine = sc.nextLine();
-//            System.out.println(nextLine);
-//            if(nextLine.contains("PING")){
-//                outputStream.write("THANH\r\n".getBytes());
-//            }
-//            if(nextLine.contains("ECHO")){
-//                String respHeader = sc.nextLine();
-//                String respBody = sc.nextLine();
-//                String response = respHeader + "\r\n" + respBody + "\r\n";
-//                outputStream.write(response.getBytes());
-//            }
-//    }
     }
 
-    private void handleCommand(String[] command, Client client) {
-        for (String s : command) {
-
+    private void handleCommand(String[] command, Client client) throws IOException {
+        String res = "";
+        switch (command[0]){
+            case "PING":
+                res = commandHandler.ping(command);
+                break;
+            case "ECHO":
+                res = commandHandler.echo(command);
+                break;
+//            case "SET":
+//                res = commandHandler.set(command);
+//                break;
+//            case "GET":
+//                res = commandHandler.get(command);
+//                break;
+//            case "INFO":
+//                res = commandHandler.info(command);
+//                break;
         }
+        if(res != null && !res.isEmpty())
+            client.outputStream.write(res.getBytes());
     }
 }
 

@@ -9,77 +9,93 @@ import java.util.List;
 @Component
 public class RespSerializer {
 
-    private int getParts(char[] dataArray, int i, String[] subArray) {
+    public String serializeBulkString(String s){
+        int length = s.length();
+        String respHeader = "$"+length;
+        String respBody = s;
+        return respHeader + "\r\n" + respBody + "\r\n";
+    }
+
+    public int getParts(char []dataArr, int i, String[] subArray){
         int j=0;
-        while (i < dataArray.length && j < subArray.length) {
-            if(dataArray[i] == '$'){
-                // Bulk String
-                // $<length>\r\n\<data>\r\n
+        while(i< dataArr.length && j < subArray.length){
+            if(dataArr[i] == '$'){
+                //bulk String
+                //$<length>\r\n<data>\r\n
                 i++;
                 String partLength = "";
-                while (i < dataArray.length && Character.isDigit(dataArray[i])) {
-                    partLength += dataArray[i];
+                while(i < dataArr.length && Character.isDigit(dataArr[i])){
+                    partLength += dataArr[i];
                     i++;
                 }
                 i+=2;
                 String part = "";
-                for (int k = 0; k < Integer.parseInt(partLength); k++) {
-                    part += dataArray[i];
+                for(int k=0; k<Integer.parseInt(partLength);k++){
+                    part+=dataArr[i++];
                 }
                 i+=2;
-                subArray[j++] = part;
+                subArray[j++]=part;
             }
         }
         return i;
-
     }
 
     public List<String[]> deseralize(byte[] command){
-//        [
-//                ["set", "key", "value"],
-//                ["set", "key", "value"]
-//        ]
-        String data = new String(command, StandardCharsets.UTF_8);
-        char[] dataArray = data.toCharArray();
+        try{
+            String data = new String(command, StandardCharsets.UTF_8);
+            char[] dataArr = data.toCharArray();
+            List<String[]> res = new ArrayList<>();
 
-        List<String[]> result = new ArrayList<>();
-        int i = 0;
+            int i=0;
+            while(i < dataArr.length){
 
-        while(i < dataArray.length){
-            char currentChar = dataArray[i];
-            if(currentChar == '*'){
-                //"*42\r\n#3set\r\n"
-                // array
-                String arrayLen = "";
-                i++;
-                while(i < dataArray.length && Character.isDigit(dataArray[i])){
-                    arrayLen += dataArray[i];
+                char curr = dataArr[i];
+
+                if(curr=='\u0000'){
+                    System.out.println("=================================================================================");
+                    System.out.println(i);
+                    System.out.println(curr);
+                    System.out.println(dataArr.length);
+                    break;
                 }
-                i+=2;
-                if(dataArray[i] == '*'){
-                    // *2
-                    // *3\r\n#3set\r\n#3key\r\n#5value
-                    // *3\r\n#3set\r\n#3key\r\n#5value
-                    for(int t=0; t< Integer.parseInt(arrayLen); t++){
-                        String nestedLen = "";
-                        i++;
-                        while (i < dataArray.length && Character.isDigit(dataArray[i])){
-                            nestedLen += dataArray[i];
-                        }
-                        i+=2;
-                        String[] subArray = new String[Integer.parseInt(nestedLen)];
-                        i = getParts(dataArray, i, subArray);
-                        result.add(subArray);
+
+                if(curr == '*'){
+                    //array
+                    String arrLen = "";
+                    i++;
+                    while(i < dataArr.length && Character.isDigit(dataArr[i])){
+                        arrLen += dataArr[i++];
                     }
-                }else{
-                    // *3\r\n#3set\r\n#3key\r\n#5value
-                    String[] subArray = new String[Integer.parseInt(arrayLen)];
-                    i = getParts(dataArray, i, subArray);
-                    result.add(subArray);
+                    i+=2;
+                    if(dataArr[i] == '*'){
+                        // *2
+                        // *3\r\n#3set\r\n#3key\r\n#5value
+                        // *3\r\n#3set\r\n#3key\r\n#5value
+                        for(int t=0;t<Integer.parseInt(arrLen);t++){
+                            String nestedLen = "";
+                            i++;
+                            char c = dataArr[i];
+                            while(i < dataArr.length && Character.isDigit(dataArr[i])){
+
+                                nestedLen += dataArr[i++];
+                            }
+                            i+=2;
+                            String[] subArray = new String[Integer.parseInt(nestedLen)];
+                            i = getParts(dataArr, i, subArray);
+                            res.add(subArray);
+                        }
+                    }else{
+                        // *3\r\n#3set\r\n#3key\r\n#5value
+                        String[] subArray = new String[Integer.parseInt(arrLen)];
+                        i = getParts(dataArr, i, subArray);
+                        res.add(subArray);
+                    }
                 }
             }
+            return res;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
-
-        return result;
+        return new ArrayList<>();
     }
 }
