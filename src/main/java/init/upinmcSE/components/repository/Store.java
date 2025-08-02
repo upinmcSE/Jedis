@@ -1,5 +1,6 @@
-package init.upinmcSE.components;
+package init.upinmcSE.components.repository;
 
+import init.upinmcSE.components.service.RespSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,7 +33,7 @@ public class Store {
 
             return "+OK\r\n";
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
             return "$-1\r\n";
         }
     }

@@ -1,6 +1,7 @@
 package init.upinmcSE;
 
-import init.upinmcSE.components.TcpServer;
+import init.upinmcSE.components.server.TcpServer;
+import init.upinmcSE.config.AppConfig;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class Main {

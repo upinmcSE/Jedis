@@ -1,6 +1,10 @@
-package init.upinmcSE.components;
+package init.upinmcSE.components.server;
 
+import init.upinmcSE.components.infa.Client;
+import init.upinmcSE.components.service.CommandHandler;
+import init.upinmcSE.components.service.RespSerializer;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -9,13 +13,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
 
 @Component
-@NoArgsConstructor
+@Slf4j
 public class TcpServer {
     @Autowired
     private RespSerializer respSerializer;
@@ -48,16 +50,15 @@ public class TcpServer {
                     }
                 });
             }
-
         } catch (IOException e) {
-            System.out.println("IOException: " + e.getMessage());
+            log.error("IOException: {}", e.getMessage());
         } finally {
             try {
                 if (clientSocket != null) {
                     clientSocket.close();
                 }
             } catch (IOException e) {
-                System.out.println("IOException: " + e.getMessage());
+                log.error("IOException: {}", e.getMessage());
             }
         }
     }
@@ -66,11 +67,9 @@ public class TcpServer {
         while (client.socket.isConnected()) {
             byte[] buffer = new byte[client.socket.getReceiveBufferSize()];
             int bytesRead = client.inputStream.read(buffer);
-            System.out.println(bytesRead);
             if (bytesRead > 0) {
                 // bytes parsing into strings
                 List<String[]> commands = respSerializer.deseralize(buffer);
-                System.out.println(Arrays.toString(commands.toArray()));
                 for (String[] command : commands) {
                     handleCommand(command, client);
                 }

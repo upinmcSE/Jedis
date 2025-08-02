@@ -1,11 +1,14 @@
-package init.upinmcSE.components;
+package init.upinmcSE.components.service;
 
+import init.upinmcSE.components.repository.Store;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
 @Component
+@Slf4j
 public class CommandHandler {
     @Autowired
     public RespSerializer respSerializer;
@@ -35,7 +38,7 @@ public class CommandHandler {
                 return store.set(key, value);
             }
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
             return "$-1\r\n";
         }
     }
@@ -45,7 +48,7 @@ public class CommandHandler {
             String key = command[1];
             return store.get(key);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
             return "$-1\r\n";
         }
     }

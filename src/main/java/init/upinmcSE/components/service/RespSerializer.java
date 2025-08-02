@@ -1,5 +1,6 @@
-package init.upinmcSE.components;
+package init.upinmcSE.components.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@Slf4j
 public class RespSerializer {
 
     public String serializeBulkString(String s){
@@ -52,10 +54,6 @@ public class RespSerializer {
                 char curr = dataArr[i];
 
                 if(curr=='\u0000'){
-                    System.out.println("=================================================================================");
-                    System.out.println(i);
-                    System.out.println(curr);
-                    System.out.println(dataArr.length);
                     break;
                 }
 
@@ -94,7 +92,7 @@ public class RespSerializer {
             }
             return res;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
         }
         return new ArrayList<>();
     }

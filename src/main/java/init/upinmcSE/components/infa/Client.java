@@ -1,4 +1,4 @@
-package init.upinmcSE.components;
+package init.upinmcSE.components.infa;
 
 import java.io.InputStream;
 import java.io.OutputStream;

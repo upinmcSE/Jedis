@@ -1,4 +1,4 @@
-package init.upinmcSE.components;
+package init.upinmcSE.components.repository;
 
 import java.time.LocalDateTime;
 
