@@ -85,12 +85,12 @@ public class TcpServer {
             case "ECHO":
                 res = commandHandler.echo(command);
                 break;
-//            case "SET":
-//                res = commandHandler.set(command);
-//                break;
-//            case "GET":
-//                res = commandHandler.get(command);
-//                break;
+            case "SET":
+                res = commandHandler.set(command);
+                break;
+            case "GET":
+                res = commandHandler.get(command);
+                break;
 //            case "INFO":
 //                res = commandHandler.info(command);
 //                break;
